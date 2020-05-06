@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                     for (int i = 0; i < array.length(); i++){
                         JSONObject object = array.getJSONObject(i);
                         Task task = new Task(
-                                object.getString("task_id"),
+                                object.getString("taskId"),
                                 object.getString("title"),
                                 object.getString("description"));
                         mTaskList.add(task);
@@ -107,7 +107,10 @@ public class MainActivity extends AppCompatActivity {
                 super.onPostExecute(s);
                 mAdapter.notifyDataSetChanged();
             }
+
+
         };
+        task.execute();
     }
 
     @Override

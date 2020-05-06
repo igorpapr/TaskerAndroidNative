@@ -31,7 +31,7 @@ public class NetworkUtils {
             urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setUseCaches(false);
             urlConnection.setDoInput(true);
-            urlConnection.setDoOutput(true);
+            //urlConnection.setDoOutput(true);
             urlConnection.connect();
 
             // Get the InputStream.
