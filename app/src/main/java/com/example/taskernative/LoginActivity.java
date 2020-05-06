@@ -45,6 +45,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private void fetchToken(){
         @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,String> task = new AsyncTask<Void, Void, String>(){
+
+            Exception probablyExcepionFromBackThread = null;
+
             @Override
             protected String doInBackground(Void... voids){
                 try {
@@ -59,10 +62,9 @@ public class LoginActivity extends AppCompatActivity {
                         return obj.getString("token");
                     }
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    probablyExcepionFromBackThread = e;
                 } catch (StatusCodeException e1){
-                    Toast.makeText(LoginActivity.this,
-                            e1.getMessage(), Toast.LENGTH_LONG).show();
+                    probablyExcepionFromBackThread = e1;
                 }
                 return null;
             }
@@ -70,7 +72,10 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
-                if (s != null){
+                if (probablyExcepionFromBackThread != null){
+                    Toast.makeText(LoginActivity.this,
+                            probablyExcepionFromBackThread.getMessage(), Toast.LENGTH_LONG).show();
+                }else if (s != null){
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putString("token", s);
                     editor.apply();

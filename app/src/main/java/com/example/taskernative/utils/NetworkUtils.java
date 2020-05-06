@@ -1,6 +1,7 @@
 package com.example.taskernative.utils;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -27,18 +28,19 @@ public class NetworkUtils {
     private static final String TASKS_BASE_URL =  "http://192.168.1.4:8080/api/tasks";
     private static final String LOGIN_URL = "http://192.168.1.4:8080/api/auth/login";
 
-    public static String getTasks() throws StatusCodeException {
+    public static String getTasks(Context context) throws StatusCodeException {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String tasksJSONString = "";
-        //TODO - GET TOKEN
-        String token = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwiaWQiOiI5ZGRhOTYyYi1hZmMwLTQ4MzItYjc3NC0xYzg2ZWRhZWU2YTEiLCJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwidXNlcm5hbWUiOiJ1c2VyIiwiaWF0IjoxNTg4Nzc3MTc0LCJleHAiOjE1ODkwNzcxNzR9.xVETW-q8YKq_vv1J1Rkmq1tTOUmOuGVI9H0a41dJQU2ggU48tUxX-520lRKU_rdEFUN8TOcY2y1mX78aThzdYg";
+
+        SharedPreferences prefs = context.getSharedPreferences("Tasker", 0);
+        String token = prefs.getString("token",null);
 
         try {
             URL requestUrl = new URL(TASKS_BASE_URL);
             urlConnection = (HttpURLConnection) requestUrl.openConnection();
             urlConnection.setRequestMethod("GET");
-            urlConnection.setRequestProperty("Authorization", token);
+            urlConnection.setRequestProperty("Authorization", "Bearer " + token);
             urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setUseCaches(false);
             urlConnection.setDoInput(true);
@@ -87,12 +89,14 @@ public class NetworkUtils {
         return tasksJSONString;
     }
 
-    public static boolean addTask(String title, String description) throws JSONException, StatusCodeException {
+    public static boolean addTask(String title, String description, Context context) throws JSONException, StatusCodeException {
         HttpURLConnection urlConnection = null;
         OutputStream out;
         Boolean toUpdate = false;
-        //TODO - GET TOKEN
-        String token = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwiaWQiOiI5ZGRhOTYyYi1hZmMwLTQ4MzItYjc3NC0xYzg2ZWRhZWU2YTEiLCJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwidXNlcm5hbWUiOiJ1c2VyIiwiaWF0IjoxNTg4Nzc3MTc0LCJleHAiOjE1ODkwNzcxNzR9.xVETW-q8YKq_vv1J1Rkmq1tTOUmOuGVI9H0a41dJQU2ggU48tUxX-520lRKU_rdEFUN8TOcY2y1mX78aThzdYg";
+
+        SharedPreferences prefs = context.getSharedPreferences("Tasker", 0);
+        String token = prefs.getString("token",null);
+
 
         JSONObject taskToSendJson = new JSONObject();
         taskToSendJson.put("title", title);
@@ -104,7 +108,7 @@ public class NetworkUtils {
             URL requestUrl = new URL(TASKS_BASE_URL);
             urlConnection = (HttpURLConnection) requestUrl.openConnection();
             urlConnection.setRequestMethod("POST");
-            urlConnection.setRequestProperty("Authorization", token);
+            urlConnection.setRequestProperty("Authorization", "Bearer " + token);
             urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setUseCaches(false);
             urlConnection.setDoOutput(true);
@@ -185,7 +189,7 @@ public class NetworkUtils {
                     return null;
                 }
                 tokenJSONString = builder.toString();
-            }else if (code == 401){
+            }else if (code == 401 || code == 404){
                 throw new StatusCodeException("Username or/and password are incorrect, please, try again");
             } else if (code == 400){
                 throw new StatusCodeException("Input data is of incorrect format. Please, try again with correct data");

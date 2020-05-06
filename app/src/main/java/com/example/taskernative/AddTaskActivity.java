@@ -33,17 +33,16 @@ public class AddTaskActivity extends AppCompatActivity {
         final String descriptionValue = description.getText().toString();
 
         @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Boolean> task = new AsyncTask<Void, Void, Boolean>(){
-
+            Exception probablyExcepionFromBackThread = null;
             @Override
             protected Boolean doInBackground(Void... voids){
                 boolean response = false;
                 try {
-                    response = NetworkUtils.addTask(titleValue,descriptionValue);
+                    response = NetworkUtils.addTask(titleValue,descriptionValue,getApplicationContext());
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    probablyExcepionFromBackThread = e;
                 } catch (StatusCodeException e1){
-                    Toast.makeText(AddTaskActivity.this,
-                            e1.getMessage(), Toast.LENGTH_LONG).show();
+                    probablyExcepionFromBackThread = e1;
                 }
                 return response;
             }
@@ -51,9 +50,10 @@ public class AddTaskActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Boolean res) {
                 super.onPostExecute(res);
-                if (!res){
-                    Toast.makeText(AddTaskActivity.this,
-                            "Error while adding task", Toast.LENGTH_LONG).show();;
+                if (probablyExcepionFromBackThread != null){
+                    Toast.makeText(getApplicationContext(),
+                            probablyExcepionFromBackThread.getMessage(),
+                            Toast.LENGTH_LONG).show();
                 }
                 else{
                     Intent replyIntent = new Intent();

@@ -64,16 +64,11 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, e.getMessage(),
                     Toast.LENGTH_LONG).show();
         }
-        // Get a handle to the RecyclerView.
+
         mRecyclerView = findViewById(R.id.recyclerview);
-
-        // Create an adapter and supply the data to be displayed.
         mAdapter = new TaskListAdapter(this, mTaskList);
-        // Connect the adapter with the RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
-        // Give the RecyclerView a default layout manager.
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
     }
 
     @Override
@@ -93,13 +88,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadDataTasks() {
         @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> task = new AsyncTask<Void, Void, Void>(){
+            Exception probablyExcepionFromBackThread = null;
+
             @Override
             protected Void doInBackground(Void... voids){
                 try{
-                    String response = NetworkUtils.getTasks();
+                    String response = NetworkUtils.getTasks(getApplicationContext());
                     if (response.length() == 0){
                         Toast.makeText(MainActivity.this,
-                                "Unknown error while getting tasks from the server", Toast.LENGTH_LONG).show();;
+                                "Unknown error while getting tasks from the server", Toast.LENGTH_LONG).show();
                     }
                     else{
                         JSONArray array = new JSONArray(response);
@@ -112,11 +109,10 @@ public class MainActivity extends AppCompatActivity {
                             mTaskList.add(task);
                         }
                     }
-                }catch (StatusCodeException es){
-                    Toast.makeText(MainActivity.this,
-                            es.getMessage(), Toast.LENGTH_LONG).show();
-                }catch (JSONException e1){
-                    e1.printStackTrace();
+                } catch (JSONException e) {
+                    probablyExcepionFromBackThread = e;
+                } catch (StatusCodeException e1){
+                    probablyExcepionFromBackThread = e1;
                 }
                 return null;
             }
@@ -124,9 +120,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Void s) {
                 super.onPostExecute(s);
-                mAdapter.notifyDataSetChanged();
-                Toast.makeText(MainActivity.this, "Successfully fetched a list of tasks",
-                        Toast.LENGTH_LONG).show();
+                if (probablyExcepionFromBackThread != null){
+                    Toast.makeText(MainActivity.this, probablyExcepionFromBackThread.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    mAdapter.notifyDataSetChanged();
+                    Toast.makeText(MainActivity.this, "Successfully fetched a list of tasks",
+                            Toast.LENGTH_LONG).show();
+                }
             }
         };
         task.execute();
