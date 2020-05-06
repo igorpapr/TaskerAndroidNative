@@ -1,6 +1,7 @@
 package com.example.taskernative;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -44,6 +45,10 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "Clicked on FAB",
+                        Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(MainActivity.this, AddTaskActivity.class);
+                startActivity(intent);
                 //TODO - send data to the server and fetch new data
                 //int wordListSize = mTaskList.size();
                 // Add a new word to the wordList.
