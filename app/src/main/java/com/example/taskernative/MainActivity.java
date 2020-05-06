@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Void s) {
                 super.onPostExecute(s);
+                mAdapter.notifyDataSetChanged();
             }
         };
     }

@@ -16,13 +16,11 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
 
     private final ArrayList<Task> mTaskList;
     private LayoutInflater mInflater;
-    private Context context;
 
     public TaskListAdapter(Context context,
                            ArrayList<Task> taskList) {
         mInflater = LayoutInflater.from(context);
         this.mTaskList = taskList;
-        this.context = context;
     }
 
     @NonNull
@@ -34,8 +32,10 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
 
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
-        String mCurrent = mTaskList.get(position);
-        holder.taskItemView.setText(mCurrent);
+        holder.taskItemView.setText(mTaskList.get(position).getTitle());
+        holder.taskDescriptionView.setText(mTaskList.get(position).getDescription());
+        //String mCurrent = mTaskList.get(position);
+        //holder.taskItemView.setText(mCurrent);
     }
 
     @Override
@@ -45,8 +45,8 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
 
 
     class TaskViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        final TextView taskItemView;
-        final TaskListAdapter mAdapter;
+        public final TextView taskItemView;
+        public final TaskListAdapter mAdapter;
         public TextView taskDescriptionView;
 
         public TaskViewHolder(View itemView, TaskListAdapter adapter) {
@@ -59,15 +59,15 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
 
         @Override
         public void onClick(View v) {
-        // Get the position of the item that was clicked.
-        int mPosition = getLayoutPosition();
-        // Use that to access the affected item in mWordList.
-        String element = mTaskList.get(mPosition);
-        // Change the word in the mWordList.
-        mTaskList.set(mPosition, "Clicked! " + element);
-        // Notify the adapter, that the data has changed so it can
-        // update the RecyclerView to display the data.
-        mAdapter.notifyDataSetChanged();
+            // Get the position of the item that was clicked.
+            //int mPosition = getLayoutPosition();
+            // Use that to access the affected item in mWordList.
+            //String element = mTaskList.get(mPosition);
+            // Change the word in the mWordList.
+            //mTaskList.set(mPosition, "Clicked! " + element);
+            // Notify the adapter, that the data has changed so it can
+            // update the RecyclerView to display the data.
+            //mAdapter.notifyDataSetChanged();
         }
     }
 }
