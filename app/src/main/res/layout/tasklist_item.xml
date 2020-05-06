@@ -7,6 +7,9 @@
     <TextView
         android:id="@+id/task"
         style="@style/task_title">
-
+    </TextView>
+    <TextView
+        android:id="@+id/taskdescription"
+        style="@style/task_title">
     </TextView>
 </LinearLayout>
