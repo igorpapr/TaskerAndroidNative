@@ -1,6 +1,7 @@
 package com.example.taskernative;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,17 +11,18 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskViewHolder> {
 
     private final ArrayList<Task> mTaskList;
     private LayoutInflater mInflater;
+    private Context context;
 
     public TaskListAdapter(Context context,
                            ArrayList<Task> taskList) {
         mInflater = LayoutInflater.from(context);
         this.mTaskList = taskList;
+        this.context = context;
     }
 
     @NonNull
@@ -33,10 +35,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         holder.taskItemView.setText(mTaskList.get(position).getTitle());
-        holder.taskDescriptionView.setText(mTaskList.get(position).getDescription());
-        //String mCurrent = mTaskList.get(position);
-        //holder.taskItemView.setText(mCurrent);
-    }
+     }
 
     @Override
     public int getItemCount() {
@@ -47,12 +46,10 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
     class TaskViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public final TextView taskItemView;
         public final TaskListAdapter mAdapter;
-        public TextView taskDescriptionView;
 
         public TaskViewHolder(View itemView, TaskListAdapter adapter) {
             super(itemView);
             taskItemView = itemView.findViewById(R.id.task);
-            taskDescriptionView = itemView.findViewById(R.id.taskdescription);
             this.mAdapter = adapter;
             itemView.setOnClickListener(this);
         }
@@ -60,14 +57,13 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
         @Override
         public void onClick(View v) {
             // Get the position of the item that was clicked.
-            //int mPosition = getLayoutPosition();
+            int mPosition = getLayoutPosition();
             // Use that to access the affected item in mWordList.
-            //String element = mTaskList.get(mPosition);
+            Task element = mTaskList.get(mPosition);
             // Change the word in the mWordList.
-            //mTaskList.set(mPosition, "Clicked! " + element);
-            // Notify the adapter, that the data has changed so it can
-            // update the RecyclerView to display the data.
-            //mAdapter.notifyDataSetChanged();
+            Intent intent = new Intent(context, TaskDetailsActivity.class);
+            intent.putExtra(MainActivity.EXTRA_TASK, element);
+            context.startActivity(intent);
         }
     }
 }

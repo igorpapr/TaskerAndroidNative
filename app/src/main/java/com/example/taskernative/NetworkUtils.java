@@ -1,14 +1,24 @@
 package com.example.taskernative;
 
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class NetworkUtils {
     private static final String LOG_TAG =
@@ -19,7 +29,7 @@ public class NetworkUtils {
     public static String getTasks(){
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
-        String tasksJSONString = null;
+        String tasksJSONString = "";
         //TODO - GET TOKEN
         String token = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwiaWQiOiI5ZGRhOTYyYi1hZmMwLTQ4MzItYjc3NC0xYzg2ZWRhZWU2YTEiLCJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwidXNlcm5hbWUiOiJ1c2VyIiwiaWF0IjoxNTg4Nzc3MTc0LCJleHAiOjE1ODkwNzcxNzR9.xVETW-q8YKq_vv1J1Rkmq1tTOUmOuGVI9H0a41dJQU2ggU48tUxX-520lRKU_rdEFUN8TOcY2y1mX78aThzdYg";
 
@@ -55,8 +65,9 @@ public class NetworkUtils {
             }
             tasksJSONString = builder.toString();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException e1) {
+            Log.e(LOG_TAG,"Couldn't get data from the server " + e1.getMessage());
+            e1.printStackTrace();
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -71,5 +82,52 @@ public class NetworkUtils {
         }
         Log.d(LOG_TAG, tasksJSONString);
         return tasksJSONString;
+    }
+
+    public static boolean addTask(String title, String description) throws JSONException {
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+        OutputStream out = null;
+        Boolean toUpdate = false;
+        //TODO - GET TOKEN
+        String token = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiUk9MRV9VU0VSIiwiaWQiOiI5ZGRhOTYyYi1hZmMwLTQ4MzItYjc3NC0xYzg2ZWRhZWU2YTEiLCJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwidXNlcm5hbWUiOiJ1c2VyIiwiaWF0IjoxNTg4Nzc3MTc0LCJleHAiOjE1ODkwNzcxNzR9.xVETW-q8YKq_vv1J1Rkmq1tTOUmOuGVI9H0a41dJQU2ggU48tUxX-520lRKU_rdEFUN8TOcY2y1mX78aThzdYg";
+
+        JSONObject taskToSendJson = new JSONObject();
+        taskToSendJson.put("title", title);
+        taskToSendJson.put("description", description);
+        String jsonToSendString = taskToSendJson.toString();
+
+
+        try {
+            URL requestUrl = new URL(TASKS_BASE_URL);
+            urlConnection = (HttpURLConnection) requestUrl.openConnection();
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setRequestProperty("Authorization", token);
+            urlConnection.setRequestProperty("Content-Type", "application/json");
+            urlConnection.setUseCaches(false);
+            //urlConnection.setDoInput(true);
+            urlConnection.setDoOutput(true);
+
+            out = new BufferedOutputStream(urlConnection.getOutputStream());
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
+            writer.write(jsonToSendString);
+            writer.flush();
+            writer.close();
+            out.close();
+
+            urlConnection.connect();
+
+            if(urlConnection.getResponseCode() == 200){
+                toUpdate = true;
+            }
+        } catch (IOException e1) {
+            Log.e(LOG_TAG,"Couldn't get data from the server " + e1.getMessage());
+            e1.printStackTrace();
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+        }
+        return toUpdate;
     }
 }

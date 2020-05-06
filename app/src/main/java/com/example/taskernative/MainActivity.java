@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private TaskListAdapter mAdapter;
 
+    public static final String EXTRA_TASK = "com.example.taskernative.extra.TASK";
+    public static final int BOOL_REQUEST = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,24 +49,11 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Clicked on FAB",
-                        Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(MainActivity.this, AddTaskActivity.class);
-                startActivity(intent);
-                //TODO - send data to the server and fetch new data
-                //int wordListSize = mTaskList.size();
-                // Add a new word to the wordList.
-                //mTaskList.addLast("+ Word " + wordListSize);
-                // Notify the adapter, that the data has changed.
-               // mRecyclerView.getAdapter().notifyItemInserted(wordListSize);
-                // Scroll to the bottom.
-               // mRecyclerView.smoothScrollToPosition(wordListSize);
+                startActivityForResult(intent, BOOL_REQUEST);
             }
         });
 
-        //for (int i = 0; i < 20; i++) {
-        //    mTaskList.addLast("Word " + i);
-        //}
         try{
             loadDataTasks();
         }catch (Exception e){
@@ -79,6 +70,21 @@ public class MainActivity extends AppCompatActivity {
         // Give the RecyclerView a default layout manager.
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == BOOL_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                try{
+                    loadDataTasks();
+                }catch (Exception e){
+                    Toast.makeText(MainActivity.this, e.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }
     }
 
     private void loadDataTasks() {
@@ -111,6 +117,8 @@ public class MainActivity extends AppCompatActivity {
             protected void onPostExecute(Void s) {
                 super.onPostExecute(s);
                 mAdapter.notifyDataSetChanged();
+                Toast.makeText(MainActivity.this, "Successfully fetched a list of tasks",
+                        Toast.LENGTH_LONG).show();
             }
 
 

@@ -1,6 +1,8 @@
 package com.example.taskernative;
 
-class Task {
+import java.io.Serializable;
+
+class Task implements Serializable {
     private String id;
     private String title;
     private String description;
