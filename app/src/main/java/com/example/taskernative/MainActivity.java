@@ -2,9 +2,14 @@ package com.example.taskernative;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import com.example.taskernative.utils.NetworkUtils;
+import com.example.taskernative.models.Task;
+import com.example.taskernative.utils.TaskListAdapter;
+import com.example.taskernative.utils.exceptions.StatusCodeException;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.Nullable;
@@ -23,7 +28,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 ////Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                //        .setAction("Action", null).show();
@@ -89,24 +93,28 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadDataTasks() {
         @SuppressLint("StaticFieldLeak") AsyncTask<Void,Void,Void> task = new AsyncTask<Void, Void, Void>(){
-
             @Override
             protected Void doInBackground(Void... voids){
-                String response = NetworkUtils.getTasks();
-                if (response.length() == 0){
-                    Toast.makeText(MainActivity.this,
-                            "Error while getting tasks from the server", Toast.LENGTH_LONG).show();;
-                }
                 try{
-                    JSONArray array = new JSONArray(response);
-                    for (int i = 0; i < array.length(); i++){
-                        JSONObject object = array.getJSONObject(i);
-                        Task task = new Task(
-                                object.getString("taskId"),
-                                object.getString("title"),
-                                object.getString("description"));
-                        mTaskList.add(task);
+                    String response = NetworkUtils.getTasks();
+                    if (response.length() == 0){
+                        Toast.makeText(MainActivity.this,
+                                "Unknown error while getting tasks from the server", Toast.LENGTH_LONG).show();;
                     }
+                    else{
+                        JSONArray array = new JSONArray(response);
+                        for (int i = 0; i < array.length(); i++){
+                            JSONObject object = array.getJSONObject(i);
+                            Task task = new Task(
+                                    object.getString("taskId"),
+                                    object.getString("title"),
+                                    object.getString("description"));
+                            mTaskList.add(task);
+                        }
+                    }
+                }catch (StatusCodeException es){
+                    Toast.makeText(MainActivity.this,
+                            es.getMessage(), Toast.LENGTH_LONG).show();
                 }catch (JSONException e1){
                     e1.printStackTrace();
                 }
@@ -120,8 +128,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Successfully fetched a list of tasks",
                         Toast.LENGTH_LONG).show();
             }
-
-
         };
         task.execute();
     }
@@ -141,10 +147,16 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_logout) {
+            SharedPreferences pref = getApplicationContext().getSharedPreferences("Tasker", 0);
+            SharedPreferences.Editor editor = pref.edit();
+            editor.remove("token");
+            editor.commit();
+            Intent intent = new Intent (MainActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

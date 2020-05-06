@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.example.taskernative.models.Task;
+
 public class TaskDetailsActivity extends AppCompatActivity {
 
     private TextView taskIdView;

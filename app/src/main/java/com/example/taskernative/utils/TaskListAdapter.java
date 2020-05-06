@@ -1,4 +1,4 @@
-package com.example.taskernative;
+package com.example.taskernative.utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +9,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.taskernative.MainActivity;
+import com.example.taskernative.R;
+import com.example.taskernative.TaskDetailsActivity;
+import com.example.taskernative.models.Task;
 
 import java.util.ArrayList;
 

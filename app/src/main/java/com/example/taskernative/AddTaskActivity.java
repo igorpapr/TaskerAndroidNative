@@ -7,19 +7,15 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.json.JSONArray;
+import com.example.taskernative.utils.NetworkUtils;
+import com.example.taskernative.utils.exceptions.StatusCodeException;
+
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class AddTaskActivity extends AppCompatActivity {
-
-    public static final String EXTRA_REPLY =
-            "com.example.taskernative.extra.REPLY";
-
     private EditText title;
     private EditText description;
 
@@ -45,6 +41,9 @@ public class AddTaskActivity extends AppCompatActivity {
                     response = NetworkUtils.addTask(titleValue,descriptionValue);
                 } catch (JSONException e) {
                     e.printStackTrace();
+                } catch (StatusCodeException e1){
+                    Toast.makeText(AddTaskActivity.this,
+                            e1.getMessage(), Toast.LENGTH_LONG).show();
                 }
                 return response;
             }
