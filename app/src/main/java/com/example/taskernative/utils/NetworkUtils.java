@@ -3,9 +3,6 @@ package com.example.taskernative.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.example.taskernative.LoginActivity;
 import com.example.taskernative.utils.exceptions.StatusCodeException;
 
 import org.json.JSONException;
@@ -25,17 +22,16 @@ import java.net.URL;
 public class NetworkUtils {
     private static final String LOG_TAG =
             NetworkUtils.class.getSimpleName();
-    private static final String TASKS_BASE_URL =  "http://192.168.1.4:8080/api/tasks";
-    private static final String LOGIN_URL = "http://192.168.1.4:8080/api/auth/login";
-
+    //private static final String TASKS_BASE_URL =  "http://192.168.1.4:8080/api/tasks";
+    //private static final String LOGIN_URL = "http://192.168.1.4:8080/api/auth/login";
+    private static final String TASKS_BASE_URL =  "https://taskerappbc.herokuapp.com/api/tasks";
+    private static final String LOGIN_URL = "https://taskerappbc.herokuapp.com/api/auth/login";
     public static String getTasks(Context context) throws StatusCodeException {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String tasksJSONString = "";
-
         SharedPreferences prefs = context.getSharedPreferences("Tasker", 0);
         String token = prefs.getString("token",null);
-
         try {
             URL requestUrl = new URL(TASKS_BASE_URL);
             urlConnection = (HttpURLConnection) requestUrl.openConnection();
@@ -44,11 +40,8 @@ public class NetworkUtils {
             urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setUseCaches(false);
             urlConnection.setDoInput(true);
-            //urlConnection.setDoOutput(true);
             urlConnection.connect();
-
             int code = urlConnection.getResponseCode();
-
             if(code == 200){
                 InputStream inputStream = urlConnection.getInputStream();
                 reader = new BufferedReader(new InputStreamReader(inputStream));

@@ -29,10 +29,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-////Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                //        .setAction("Action", null).show();
-// Way to alert
-
 public class MainActivity extends AppCompatActivity {
 
     private final ArrayList<Task> mTaskList = new ArrayList<>();
